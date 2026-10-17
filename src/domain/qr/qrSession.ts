@@ -6,8 +6,18 @@ export type QrSession = {
   expiresAt: Date
 }
 
-export function secondsUntilExpiry(session: QrSession, now: Date): number {
-  return Math.max(0, Math.ceil((session.expiresAt.getTime() - now.getTime()) / 1000))
+/** Mirrors the backend state machine (docs/ARCHITECTURE.md §3). */
+export type QrStatus = 'PENDING' | 'SCANNED' | 'CONFIRMED' | 'REJECTED' | 'CONSUMED' | 'EXPIRED'
+
+/** What the desktop learns from polling. Deliberately says nothing about *who* scanned. */
+export type QrStatusSnapshot = {
+  status: QrStatus
+  /** Local-clock expiry of the current state; absent once the session is gone (EXPIRED). */
+  expiresAt?: Date
+}
+
+export function secondsUntilExpiry(expiresAt: Date, now: Date): number {
+  return Math.max(0, Math.ceil((expiresAt.getTime() - now.getTime()) / 1000))
 }
 
 export function formatCountdown(seconds: number): string {
