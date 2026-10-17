@@ -35,34 +35,18 @@ Vite proxies `/api/*` to the backend, so the browser only ever talks to one orig
 and the cookies (`SESSION`, `qr_bind`, `XSRF-TOKEN`) behave like they would in production.
 To point at a different backend: `BACKEND_URL=http://localhost:8090 bun dev`.
 
-### Trying a QR login locally
+**Full step-by-step guide (backend + frontend, one PC or a real phone):
+[RUNNING.md](https://github.com/riorisqi/advancedlogin-backend/blob/main/docs/RUNNING.md).**
 
-Cookies are per browser profile, so use two:
+### Trying a QR login
 
-1. **Desktop:** a normal window at http://localhost:5173 shows the QR code.
-2. **Phone:** an **incognito/private** window at http://localhost:5173/m. Sign in with a test
-   account (seeded from `app.seed-users` in the backend's `application-dev.yml`; run the backend
-   with the `dev` profile).
-3. On the desktop, click **dev: open approve link** under the QR. Paste the URL into the phone
-   window, check the details, press **Approve**.
-4. The desktop shows "Welcome, …".
+- **On one PC** (normal window = desktop, incognito window = phone):
+  [RUNNING.md §4](https://github.com/riorisqi/advancedlogin-backend/blob/main/docs/RUNNING.md#4-try-a-qr-login-on-one-pc-no-phone)
+- **With a real phone and its camera** (`bun run dev:lan`, HTTPS on your LAN):
+  [RUNNING.md §5](https://github.com/riorisqi/advancedlogin-backend/blob/main/docs/RUNNING.md#5-test-with-a-real-phone-camera-scanner)
 
 The small grey **dev:** line under the QR tells you whether updates arrive over the SSE stream
 or the polling fallback.
-
-### With a real phone (camera scanner)
-
-1. PC and phone on the **same Wi-Fi**. Backend running as usual.
-2. In `frontend/`: `bun run dev:lan`. It prints a `Network: https://192.168.x.x:5173/` address.
-   (Windows may ask to allow Node/bun through the firewall: allow it for private networks.)
-3. **Desktop:** open that `https://192.168.x.x:5173` address (not localhost: the QR link is built
-   from the address the desktop uses, and the phone can't reach "localhost").
-4. **Phone:** open the same address + `/m`. Accept the certificate warning once (the dev cert is
-   self-signed), sign in, tap **Scan QR code**, allow the camera, point it at the screen.
-5. Check the details on the phone (browser, OS, the PC's LAN IP), tap **Approve**. The desktop
-   signs in.
-
-Why HTTPS: browsers only allow camera access on secure origins (`https://` or `localhost`).
 
 ## Scripts
 
