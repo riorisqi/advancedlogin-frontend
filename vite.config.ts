@@ -16,6 +16,9 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       host: lan,
+      // Bun crashes on WebSocket upgrades over HTTPS, which kills the dev server as soon as the
+      // HMR client connects. In LAN mode: no WebSocket server, no HMR (refresh after changes).
+      ...(lan ? { hmr: false, ws: false as const } : {}),
       // One origin for the browser: no CORS, and cookies behave as in production.
       proxy: {
         '/api': {
