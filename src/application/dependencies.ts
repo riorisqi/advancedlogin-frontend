@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react'
 import type { AuthGateway } from './ports/AuthGateway'
 import type { HealthGateway } from './ports/HealthGateway'
+import type { QrGateway } from './ports/QrGateway'
 
 // Every port the application needs. The concrete implementations are created in
 // `src/app/` (the composition root) and handed down through this context, so
@@ -8,6 +9,7 @@ import type { HealthGateway } from './ports/HealthGateway'
 export type Dependencies = {
   healthGateway: HealthGateway
   authGateway: AuthGateway
+  qrGateway: QrGateway
 }
 
 export const DependenciesContext = createContext<Dependencies | null>(null)

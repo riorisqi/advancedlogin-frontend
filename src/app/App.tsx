@@ -4,6 +4,7 @@ import { RequireAuth } from '@/presentation/components/RequireAuth'
 import { HomePage } from '@/presentation/pages/HomePage'
 import { MobileHomePage } from '@/presentation/pages/MobileHomePage'
 import { MobileLoginPage } from '@/presentation/pages/MobileLoginPage'
+import { StatusPage } from '@/presentation/pages/StatusPage'
 import { DependenciesProvider } from './DependenciesProvider'
 
 export function App() {
@@ -14,6 +15,7 @@ export function App() {
           <Routes>
             {/* Desktop */}
             <Route path="/" element={<HomePage />} />
+            <Route path="/status" element={<StatusPage />} />
 
             {/* Phone ("/m" = mobile web app) */}
             <Route path="/m/login" element={<MobileLoginPage />} />
