@@ -23,7 +23,7 @@ export function createHttpQrGateway(): QrGateway {
       // The response also sets the HttpOnly qr_bind cookie. We never touch it: the browser
       // stores it and sends it back to /api/qr/* on its own.
       const res = await send('POST', '/api/qr/sessions')
-      if (res.status !== 201) throw new HttpError(res.status)
+      if (res.status !== 201) throw HttpError.from(res)
       const dto: CreateQrSessionDto = await res.json()
       return { id: dto.qrId, content: dto.qrContent, expiresAt: toLocalClockFromResponse(dto.expiresAt, res) }
     },
@@ -32,7 +32,7 @@ export function createHttpQrGateway(): QrGateway {
       const res = await send('GET', `/api/qr/sessions/${encodeURIComponent(qrId)}`, { signal })
       // 404 = gone, expired, or not bound to this browser. For the desktop it all means "expired".
       if (res.status === 404) return { status: 'EXPIRED' }
-      if (!res.ok) throw new HttpError(res.status)
+      if (!res.ok) throw HttpError.from(res)
       const dto: QrStatusDto = await res.json()
       return {
         status: dto.status,
@@ -47,7 +47,7 @@ export function createHttpQrGateway(): QrGateway {
       })
       if (res.status === 404) throw new QrNotFoundError()
       if (res.status === 400 || res.status === 409) throw new QrConflictError('This login request can no longer be completed')
-      if (!res.ok) throw new HttpError(res.status)
+      if (!res.ok) throw HttpError.from(res)
       // 200 + Set-Cookie: SESSION=... (HttpOnly). We don't need the body: the auth state
       // re-reads /api/me, the single source of truth for who's logged in.
     },

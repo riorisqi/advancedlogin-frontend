@@ -10,6 +10,7 @@ type LoginRequestDto = {
   browser: string
   os: string
   ipAddress: string
+  approximateLocation: string | null
   expiresAt: string
 }
 
@@ -27,6 +28,7 @@ export function createHttpQrApprovalGateway(): QrApprovalGateway {
         browser: dto.browser,
         os: dto.os,
         ipAddress: dto.ipAddress,
+        approximateLocation: dto.approximateLocation ?? undefined,
         expiresAt: toLocalClockFromResponse(dto.expiresAt, res), // a deadline: correct for clock skew
       }
     },
@@ -49,5 +51,5 @@ async function throwOnError(res: Response): Promise<void> {
     const problem = (await res.json().catch(() => null)) as { detail?: string } | null
     throw new QrConflictError(problem?.detail)
   }
-  throw new HttpError(res.status)
+  throw HttpError.from(res)
 }

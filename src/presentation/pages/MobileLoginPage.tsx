@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router'
 import { useAuth } from '@/application/auth/authContext'
-import { InvalidCredentialsError } from '@/application/auth/errors'
+import { InvalidCredentialsError, TooManyAttemptsError } from '@/application/auth/errors'
 import { Card } from '../components/Card'
 
 /** Password login for the "phone" client. The phone is the only place a password is ever typed. */
@@ -29,7 +29,8 @@ export function MobileLoginPage() {
       await auth.login(username, password)
       navigate(from, { replace: true })
     } catch (err) {
-      setError(err instanceof InvalidCredentialsError ? err.message : 'Something went wrong. Try again.')
+      const known = err instanceof InvalidCredentialsError || err instanceof TooManyAttemptsError
+      setError(known ? err.message : 'Something went wrong. Try again.')
       setPassword('')
     } finally {
       setSubmitting(false)

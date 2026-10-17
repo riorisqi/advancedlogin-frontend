@@ -9,6 +9,8 @@ export type LoginRequest = {
   browser: string
   os: string
   ipAddress: string
+  /** e.g. "Jakarta, Indonesia" or "Local network"; absent when unknown. Approximate by nature. */
+  approximateLocation?: string
   /** Local-clock deadline to approve/reject. */
   expiresAt: Date
 }

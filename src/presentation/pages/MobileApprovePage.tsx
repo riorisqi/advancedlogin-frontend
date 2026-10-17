@@ -41,6 +41,7 @@ export function MobileApprovePage() {
         <Detail label="Browser" value={request.browser} />
         <Detail label="Operating system" value={request.os} />
         <Detail label="IP address" value={request.ipAddress} />
+        {request.approximateLocation && <Detail label="Location" value={request.approximateLocation} />}
         <Detail label="Requested at" value={request.requestedAt.toLocaleTimeString()} />
         <Detail label="Time left" value={<Countdown deadline={request.expiresAt} />} />
       </dl>

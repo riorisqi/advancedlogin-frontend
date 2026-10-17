@@ -1,4 +1,4 @@
-import { InvalidCredentialsError } from '@/application/auth/errors'
+import { InvalidCredentialsError, TooManyAttemptsError } from '@/application/auth/errors'
 import type { AuthGateway } from '@/application/ports/AuthGateway'
 import type { User } from '@/domain/user/user'
 import { HttpError, send } from '../http/httpClient'
@@ -15,20 +15,21 @@ export function createHttpAuthGateway(): AuthGateway {
     async currentUser(signal) {
       const res = await send('GET', '/api/me', { signal })
       if (res.status === 401) return null
-      if (!res.ok) throw new HttpError(res.status)
+      if (!res.ok) throw HttpError.from(res)
       return toDomain(await res.json())
     },
 
     async login(username, password) {
       const res = await send('POST', '/api/auth/login', { body: { username, password } })
       if (res.status === 401 || res.status === 400) throw new InvalidCredentialsError()
-      if (!res.ok) throw new HttpError(res.status)
+      if (res.status === 429) throw new TooManyAttemptsError(HttpError.from(res).retryAfterSeconds ?? 60)
+      if (!res.ok) throw HttpError.from(res)
       return toDomain(await res.json())
     },
 
     async logout() {
       const res = await send('POST', '/api/auth/logout')
-      if (!res.ok) throw new HttpError(res.status)
+      if (!res.ok) throw HttpError.from(res)
     },
   }
 }

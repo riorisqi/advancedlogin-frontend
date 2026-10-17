@@ -4,10 +4,22 @@
 
 export class HttpError extends Error {
   readonly status: number
+  /** From the Retry-After header of a 429 (rate limited) response. */
+  readonly retryAfterSeconds?: number
 
-  constructor(status: number) {
-    super(`Backend responded ${status}`)
+  constructor(status: number, retryAfterSeconds?: number) {
+    super(
+      status === 429
+        ? `Too many requests. Try again in ${retryAfterSeconds ?? 60} seconds.`
+        : `Backend responded ${status}`,
+    )
     this.status = status
+    this.retryAfterSeconds = retryAfterSeconds
+  }
+
+  static from(res: Response): HttpError {
+    const retryAfter = Number(res.headers.get('Retry-After'))
+    return new HttpError(res.status, Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : undefined)
   }
 }
 
@@ -47,7 +59,7 @@ export async function send(method: Method, url: string, options: RequestOptions 
 export async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
   const res = await send('GET', url, { signal })
   if (!res.ok) {
-    throw new HttpError(res.status)
+    throw HttpError.from(res)
   }
   return res.json() as Promise<T>
 }
