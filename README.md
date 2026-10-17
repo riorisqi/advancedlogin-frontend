@@ -41,7 +41,8 @@ Cookies are per browser profile, so use two:
 
 1. **Desktop:** a normal window at http://localhost:5173 shows the QR code.
 2. **Phone:** an **incognito/private** window at http://localhost:5173/m. Sign in with a test
-   account (seeded from `app.seed-users` in the backend's `application.yml`).
+   account (seeded from `app.seed-users` in the backend's `application-dev.yml`; run the backend
+   with the `dev` profile).
 3. On the desktop, click **dev: open approve link** under the QR. Paste the URL into the phone
    window, check the details, press **Approve**.
 4. The desktop shows "Welcome, …".
