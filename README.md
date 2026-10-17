@@ -104,8 +104,7 @@ src/
 The dependency rule is **enforced by `bun run lint`**: `.oxlintrc.json` has
 `no-restricted-imports` overrides per folder (e.g. `presentation/` importing from
 `infrastructure/` fails the lint). Why the layers exist and how they map to the backend:
-[CLEAN_ARCHITECTURE.md](https://github.com/riorisqi/advancedlogin-backend/blob/main/docs/CLEAN_ARCHITECTURE.md)
-(§4 is the frontend). Security backlog: [SECURITY.md](https://github.com/riorisqi/advancedlogin-backend/blob/main/docs/SECURITY.md).
+[CLEAN_ARCHITECTURE.md §4](https://github.com/riorisqi/advancedlogin-backend/blob/main/docs/CLEAN_ARCHITECTURE.md#4-frontend-react--typescript) (the frontend part). Security backlog: [SECURITY.md](https://github.com/riorisqi/advancedlogin-backend/blob/main/docs/SECURITY.md).
 
 ## Things worth reading in the code
 
