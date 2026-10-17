@@ -1,3 +1,4 @@
+import { QrConflictError, QrNotFoundError } from '@/application/qr/errors'
 import type { QrGateway } from '@/application/ports/QrGateway'
 import type { QrStatus } from '@/domain/qr/qrSession'
 import { HttpError, send } from '../http/httpClient'
@@ -13,6 +14,7 @@ type CreateQrSessionDto = {
 type QrStatusDto = {
   status: QrStatus
   expiresAt: string
+  exchangeCode: string | null
 }
 
 export function createHttpQrGateway(): QrGateway {
@@ -32,7 +34,22 @@ export function createHttpQrGateway(): QrGateway {
       if (res.status === 404) return { status: 'EXPIRED' }
       if (!res.ok) throw new HttpError(res.status)
       const dto: QrStatusDto = await res.json()
-      return { status: dto.status, expiresAt: toLocalClockFromResponse(dto.expiresAt, res) }
+      return {
+        status: dto.status,
+        expiresAt: toLocalClockFromResponse(dto.expiresAt, res),
+        exchangeCode: dto.exchangeCode ?? undefined,
+      }
+    },
+
+    async exchange(qrId, exchangeCode) {
+      const res = await send('POST', `/api/qr/sessions/${encodeURIComponent(qrId)}/exchange`, {
+        body: { code: exchangeCode },
+      })
+      if (res.status === 404) throw new QrNotFoundError()
+      if (res.status === 400 || res.status === 409) throw new QrConflictError('This login request can no longer be completed')
+      if (!res.ok) throw new HttpError(res.status)
+      // 200 + Set-Cookie: SESSION=... (HttpOnly). We don't need the body: the auth state
+      // re-reads /api/me, the single source of truth for who's logged in.
     },
   }
 }

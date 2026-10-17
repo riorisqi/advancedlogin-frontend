@@ -14,6 +14,8 @@ export type QrStatusSnapshot = {
   status: QrStatus
   /** Local-clock expiry of the current state; absent once the session is gone (EXPIRED). */
   expiresAt?: Date
+  /** Only with CONFIRMED: the one-time code this browser trades for a real session. */
+  exchangeCode?: string
 }
 
 export function secondsUntilExpiry(expiresAt: Date, now: Date): number {

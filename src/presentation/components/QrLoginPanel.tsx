@@ -48,7 +48,7 @@ export function QrLoginPanel() {
           )}
           {state.kind === 'loading' && <div className="h-full w-full animate-pulse rounded-lg bg-slate-100" />}
           {state.kind === 'confirmed' && (
-            <Overlay icon="✅" title="Approved on your phone" text="Finishing sign-in arrives in slice 6" />
+            <Overlay icon="✅" title="Approved on your phone" text="Signing you in…" />
           )}
           {state.kind === 'rejected' && (
             <Overlay icon="⛔" title="Login declined" text="It was rejected on the phone.">
@@ -56,7 +56,11 @@ export function QrLoginPanel() {
             </Overlay>
           )}
           {state.kind === 'expired' && <Overlay title="QR code expired">{reloadButton}</Overlay>}
-          {state.kind === 'error' && <Overlay title="Could not load QR code">{reloadButton}</Overlay>}
+          {state.kind === 'error' && (
+            <Overlay title="Something went wrong" text={state.message}>
+              {reloadButton}
+            </Overlay>
+          )}
         </div>
 
         <p className="mt-3 h-5 text-sm text-slate-500" aria-live="polite">

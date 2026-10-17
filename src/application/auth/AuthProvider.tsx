@@ -32,9 +32,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState({ status: 'anonymous' })
   }, [authGateway])
 
+  const refresh = useCallback(async () => {
+    const user = await authGateway.currentUser()
+    setState(user ? { status: 'authenticated', user } : { status: 'anonymous' })
+  }, [authGateway])
+
   // useMemo keeps the context value stable, so consumers don't re-render on every
   // provider render, only when the auth state actually changes.
-  const value = useMemo<Auth>(() => ({ ...state, login, logout }), [state, login, logout])
+  const value = useMemo<Auth>(() => ({ ...state, login, logout, refresh }), [state, login, logout, refresh])
 
   return <AuthContext value={value}>{children}</AuthContext>
 }

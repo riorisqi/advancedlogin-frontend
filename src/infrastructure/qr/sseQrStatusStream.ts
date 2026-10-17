@@ -6,6 +6,7 @@ import { toLocalClock } from '../http/serverClock'
 type QrStatusEventDto = {
   status: QrStatus
   expiresAt: string
+  exchangeCode: string | null
   serverTime: string // EventSource hides response headers, so the server sends its clock in the payload
 }
 
@@ -26,7 +27,11 @@ export function createSseQrStatusStream(): QrStatusStream {
 
       source.addEventListener('status', (event) => {
         const dto = JSON.parse(event.data) as QrStatusEventDto
-        onSnapshot({ status: dto.status, expiresAt: toLocalClock(dto.expiresAt, new Date(dto.serverTime).getTime()) })
+        onSnapshot({
+          status: dto.status,
+          expiresAt: toLocalClock(dto.expiresAt, new Date(dto.serverTime).getTime()),
+          exchangeCode: dto.exchangeCode ?? undefined,
+        })
       })
 
       source.onerror = () => {

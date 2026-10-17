@@ -11,6 +11,8 @@ export type AuthState =
 export type Auth = AuthState & {
   login(username: string, password: string): Promise<void>
   logout(): Promise<void>
+  /** Re-reads the session from the backend, e.g. after a QR login set a new SESSION cookie. */
+  refresh(): Promise<void>
 }
 
 export const AuthContext = createContext<Auth | null>(null)

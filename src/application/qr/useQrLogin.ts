@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { secondsUntilExpiry, type QrSession, type QrStatusSnapshot } from '@/domain/qr/qrSession'
+import { useAuth } from '../auth/authContext'
 import { useDependencies } from '../dependencies'
 import type { QrGateway } from '../ports/QrGateway'
 
@@ -15,13 +16,14 @@ export type QrLiveTransport = 'sse' | 'polling'
 export type QrLoginState =
   | { kind: 'loading' }
   | { kind: 'active'; session: QrSession; status: 'PENDING' | 'SCANNED'; secondsLeft: number }
-  | { kind: 'confirmed' }
+  | { kind: 'confirmed'; qrId: string; exchangeCode: string }
   | { kind: 'rejected' }
   | { kind: 'expired' }
   | { kind: 'error'; message: string }
 
 export function useQrLogin(): { state: QrLoginState; refresh: () => void; transport: QrLiveTransport } {
   const { qrGateway, qrStatusStream } = useDependencies()
+  const auth = useAuth()
   const [state, setState] = useState<QrLoginState>({ kind: 'loading' })
   // Id of the session whose stream failed (so it's being polled). Anything else is on SSE.
   const [pollingFor, setPollingFor] = useState<string | null>(null)
@@ -104,6 +106,29 @@ export function useQrLogin(): { state: QrLoginState; refresh: () => void; transp
     setGeneration((g) => g + 1)
   }, [])
 
+  // 4. Approved on the phone: trade the code for a real session, then let the auth state
+  //    re-read /api/me. The page then re-renders as signed in (this component unmounts).
+  const confirmed = state.kind === 'confirmed' ? state : null
+  const refreshAuth = auth.refresh
+  useEffect(() => {
+    if (!confirmed) return
+    let cancelled = false
+    // queueMicrotask again: StrictMode's dev double-run must not send the one-time code twice
+    // (the second request would get 409 and flash an error).
+    queueMicrotask(async () => {
+      if (cancelled) return
+      try {
+        await qrGateway.exchange(confirmed.qrId, confirmed.exchangeCode)
+        await refreshAuth()
+      } catch (err) {
+        if (!cancelled) setState({ kind: 'error', message: err instanceof Error ? err.message : String(err) })
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [qrGateway, refreshAuth, confirmed])
+
   // Derived during render instead of stored: no effect has to "reset" it for a new session.
   const transport: QrLiveTransport = activeId !== null && pollingFor === activeId ? 'polling' : 'sse'
 
@@ -152,7 +177,8 @@ function applySnapshot(prev: QrLoginState, polledId: string, snapshot: QrStatusS
       return { kind: 'active', session, status: snapshot.status, secondsLeft: secondsUntilExpiry(session.expiresAt, new Date()) }
     }
     case 'CONFIRMED':
-      return { kind: 'confirmed' }
+      if (!snapshot.exchangeCode) return { kind: 'error', message: 'Approved, but no login code was received' }
+      return { kind: 'confirmed', qrId: prev.session.id, exchangeCode: snapshot.exchangeCode }
     case 'REJECTED':
       return { kind: 'rejected' }
     case 'EXPIRED':
