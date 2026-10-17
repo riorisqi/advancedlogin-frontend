@@ -14,8 +14,9 @@ export default defineConfig({
     // Forward /api/* to Spring Boot. The browser only ever talks to the Vite origin,
     // so there's no CORS, and cookies (SESSION, qr_bind, XSRF-TOKEN) behave like
     // they will in production behind a single domain.
+    // BACKEND_URL lets you point at a second backend instance without editing this file.
     proxy: {
-      '/api': 'http://localhost:8080',
+      '/api': process.env.BACKEND_URL ?? 'http://localhost:8080',
     },
   },
 })

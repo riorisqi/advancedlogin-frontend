@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react'
+import type { AuthGateway } from './ports/AuthGateway'
 import type { HealthGateway } from './ports/HealthGateway'
 
 // Every port the application needs. The concrete implementations are created in
@@ -6,6 +7,7 @@ import type { HealthGateway } from './ports/HealthGateway'
 // application code never imports from `infrastructure/`.
 export type Dependencies = {
   healthGateway: HealthGateway
+  authGateway: AuthGateway
 }
 
 export const DependenciesContext = createContext<Dependencies | null>(null)
