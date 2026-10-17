@@ -4,5 +4,57 @@
   "rules": {
     "react/rules-of-hooks": "error",
     "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
+  },
+  // Clean architecture dependency rule: imports may only point inwards.
+  //   app -> presentation -> application -> domain
+  //   app -> infrastructure -> application (ports) -> domain
+  "overrides": [
+    {
+      "files": ["src/domain/**"],
+      "rules": {
+        "no-restricted-imports": ["error", {
+          "paths": [
+            { "name": "react", "message": "domain/ is plain TypeScript: no React." }
+          ],
+          "patterns": [
+            { "group": ["@/application/*", "@/infrastructure/*", "@/presentation/*", "@/app/*", "**/application/**", "**/infrastructure/**", "**/presentation/**", "**/app/**"],
+              "message": "domain/ must not depend on outer layers." }
+          ]
+        }]
+      }
+    },
+    {
+      "files": ["src/application/**"],
+      "rules": {
+        "no-restricted-imports": ["error", {
+          "patterns": [
+            { "group": ["@/infrastructure/*", "@/presentation/*", "@/app/*", "**/infrastructure/**", "**/presentation/**", "**/app/**"],
+              "message": "application/ may only depend on domain/. Need something from outside? Define a port in application/ports." }
+          ]
+        }]
+      }
+    },
+    {
+      "files": ["src/infrastructure/**"],
+      "rules": {
+        "no-restricted-imports": ["error", {
+          "patterns": [
+            { "group": ["@/presentation/*", "@/app/*", "**/presentation/**", "**/app/**"],
+              "message": "infrastructure/ implements application ports; it must not know about UI or the composition root." }
+          ]
+        }]
+      }
+    },
+    {
+      "files": ["src/presentation/**"],
+      "rules": {
+        "no-restricted-imports": ["error", {
+          "patterns": [
+            { "group": ["@/infrastructure/*", "@/app/*", "**/infrastructure/**", "**/app/**"],
+              "message": "presentation/ talks to the application (hooks), never to infrastructure directly." }
+          ]
+        }]
+      }
+    }
+  ]
 }
