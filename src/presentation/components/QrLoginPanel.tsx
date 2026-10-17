@@ -6,7 +6,7 @@ import { formatCountdown } from '@/domain/qr/qrSession'
 const QR_SIZE = 224
 
 export function QrLoginPanel() {
-  const { state, refresh } = useQrLogin()
+  const { state, refresh, transport } = useQrLogin()
 
   const reloadButton = (
     <button
@@ -65,6 +65,12 @@ export function QrLoginPanel() {
               ? `Waiting for confirmation · ${formatCountdown(state.secondsLeft)}`
               : `Expires in ${formatCountdown(state.secondsLeft)}`)}
         </p>
+
+        {import.meta.env.DEV && state.kind === 'active' && (
+          <p className="text-[11px] text-slate-400">
+            dev: live updates via {transport === 'sse' ? 'SSE stream' : 'polling (fallback)'}
+          </p>
+        )}
 
         {/* Dev shortcut until the phone camera scanner exists (slice 7): open the approve URL directly.
             Open it in a *different* browser profile (e.g. incognito) that's logged in as the phone user. */}

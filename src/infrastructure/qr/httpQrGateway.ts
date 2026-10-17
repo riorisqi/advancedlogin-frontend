@@ -1,7 +1,7 @@
 import type { QrGateway } from '@/application/ports/QrGateway'
 import type { QrStatus } from '@/domain/qr/qrSession'
 import { HttpError, send } from '../http/httpClient'
-import { toLocalClock } from '../http/serverClock'
+import { toLocalClockFromResponse } from '../http/serverClock'
 
 // Wire formats (QrDesktopController on the backend).
 type CreateQrSessionDto = {
@@ -23,7 +23,7 @@ export function createHttpQrGateway(): QrGateway {
       const res = await send('POST', '/api/qr/sessions')
       if (res.status !== 201) throw new HttpError(res.status)
       const dto: CreateQrSessionDto = await res.json()
-      return { id: dto.qrId, content: dto.qrContent, expiresAt: toLocalClock(dto.expiresAt, res) }
+      return { id: dto.qrId, content: dto.qrContent, expiresAt: toLocalClockFromResponse(dto.expiresAt, res) }
     },
 
     async getStatus(qrId, signal) {
@@ -32,7 +32,7 @@ export function createHttpQrGateway(): QrGateway {
       if (res.status === 404) return { status: 'EXPIRED' }
       if (!res.ok) throw new HttpError(res.status)
       const dto: QrStatusDto = await res.json()
-      return { status: dto.status, expiresAt: toLocalClock(dto.expiresAt, res) }
+      return { status: dto.status, expiresAt: toLocalClockFromResponse(dto.expiresAt, res) }
     },
   }
 }

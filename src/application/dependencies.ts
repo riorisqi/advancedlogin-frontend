@@ -3,6 +3,7 @@ import type { AuthGateway } from './ports/AuthGateway'
 import type { HealthGateway } from './ports/HealthGateway'
 import type { QrApprovalGateway } from './ports/QrApprovalGateway'
 import type { QrGateway } from './ports/QrGateway'
+import type { QrStatusStream } from './ports/QrStatusStream'
 
 // Every port the application needs. The concrete implementations are created in
 // `src/app/` (the composition root) and handed down through this context, so
@@ -12,6 +13,7 @@ export type Dependencies = {
   authGateway: AuthGateway
   qrGateway: QrGateway
   qrApprovalGateway: QrApprovalGateway
+  qrStatusStream: QrStatusStream
 }
 
 export const DependenciesContext = createContext<Dependencies | null>(null)

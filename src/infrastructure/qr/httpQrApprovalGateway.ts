@@ -1,7 +1,7 @@
 import { QrConflictError, QrNotFoundError } from '@/application/qr/errors'
 import type { QrApprovalGateway } from '@/application/ports/QrApprovalGateway'
 import { HttpError, send } from '../http/httpClient'
-import { toLocalClock } from '../http/serverClock'
+import { toLocalClockFromResponse } from '../http/serverClock'
 
 // Wire format of LoginRequestResponse (QrMobileController on the backend).
 type LoginRequestDto = {
@@ -27,7 +27,7 @@ export function createHttpQrApprovalGateway(): QrApprovalGateway {
         browser: dto.browser,
         os: dto.os,
         ipAddress: dto.ipAddress,
-        expiresAt: toLocalClock(dto.expiresAt, res), // a deadline: correct for clock skew
+        expiresAt: toLocalClockFromResponse(dto.expiresAt, res), // a deadline: correct for clock skew
       }
     },
 
