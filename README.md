@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/images/banner.svg" alt="AdvancedLogin: QR code login, end to end" width="760"></p>
+
 # AdvancedLogin — Frontend
 
 The React app for a learning project on **QR code login** (like WhatsApp Web, Discord or Steam):
@@ -53,7 +55,7 @@ or the polling fallback.
 | Command | What it does |
 |---|---|
 | `bun dev` | dev server on http://localhost:5173 with hot reload and the `/api` proxy |
-| `bun run dev:lan` | same, but HTTPS (self-signed) and reachable from your LAN, for a real phone |
+| `bun run dev:lan` | HTTPS (self-signed) and reachable from your LAN, for a real phone; no hot reload (Bun can't do WebSockets over HTTPS), so refresh after changes |
 | `bun run build` | type-check (`tsc -b`) and build to `dist/` |
 | `bun run lint` | oxlint, including the architecture rules below |
 | `bun test` | unit tests (`*.test.ts`, run by bun's built-in test runner) |
@@ -73,6 +75,8 @@ or the polling fallback.
 All `/m/*` pages except `/m/login` are behind `RequireAuth`; after signing in you land where you were going.
 
 ## Code layout (clean architecture)
+
+<p align="center"><img src="docs/images/clean-architecture.svg" alt="Clean architecture rings, backend and frontend" width="820"></p>
 
 ```
 src/
