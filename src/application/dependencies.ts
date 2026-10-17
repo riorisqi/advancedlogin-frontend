@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react'
 import type { AuthGateway } from './ports/AuthGateway'
 import type { HealthGateway } from './ports/HealthGateway'
 import type { QrApprovalGateway } from './ports/QrApprovalGateway'
+import type { QrCodeScanner } from './ports/QrCodeScanner'
 import type { QrGateway } from './ports/QrGateway'
 import type { QrStatusStream } from './ports/QrStatusStream'
 
@@ -14,6 +15,7 @@ export type Dependencies = {
   qrGateway: QrGateway
   qrApprovalGateway: QrApprovalGateway
   qrStatusStream: QrStatusStream
+  qrCodeScanner: QrCodeScanner
 }
 
 export const DependenciesContext = createContext<Dependencies | null>(null)

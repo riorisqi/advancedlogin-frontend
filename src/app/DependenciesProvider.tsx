@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { DependenciesContext, type Dependencies } from '@/application/dependencies'
 import { createHttpAuthGateway } from '@/infrastructure/auth/httpAuthGateway'
+import { createCameraQrCodeScanner } from '@/infrastructure/camera/cameraQrCodeScanner'
 import { createHttpHealthGateway } from '@/infrastructure/health/httpHealthGateway'
 import { createHttpQrApprovalGateway } from '@/infrastructure/qr/httpQrApprovalGateway'
 import { createHttpQrGateway } from '@/infrastructure/qr/httpQrGateway'
@@ -14,6 +15,7 @@ const dependencies: Dependencies = {
   qrGateway: createHttpQrGateway(),
   qrApprovalGateway: createHttpQrApprovalGateway(),
   qrStatusStream: createSseQrStatusStream(),
+  qrCodeScanner: createCameraQrCodeScanner(),
 }
 
 export function DependenciesProvider({ children }: { children: ReactNode }) {

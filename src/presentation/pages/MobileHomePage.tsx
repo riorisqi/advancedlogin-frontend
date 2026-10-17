@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { useAuth } from '@/application/auth/authContext'
 import { Card } from '../components/Card'
 
-/** Logged-in phone home. Gets the "Scan QR" button in slice 4. */
+/** Logged-in phone home: scan a desktop's QR code, or sign out. */
 export function MobileHomePage() {
   const auth = useAuth()
   const [loggingOut, setLoggingOut] = useState(false)
@@ -21,13 +22,12 @@ export function MobileHomePage() {
   return (
     <Card title={`Hi, ${auth.user.displayName}`} subtitle={`Signed in as @${auth.user.username}`}>
       <div className="space-y-3">
-        <button
-          disabled
-          className="w-full rounded-lg bg-slate-100 px-4 py-3 font-semibold text-slate-400"
-          title="Coming in slice 4"
+        <Link
+          to="/m/scan"
+          className="block w-full rounded-lg bg-indigo-600 px-4 py-3 text-center font-semibold text-white hover:bg-indigo-500"
         >
-          Scan QR code (slice 4)
-        </button>
+          Scan QR code
+        </Link>
         <button
           onClick={handleLogout}
           disabled={loggingOut}

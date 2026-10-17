@@ -5,6 +5,7 @@ import { HomePage } from '@/presentation/pages/HomePage'
 import { MobileApprovePage } from '@/presentation/pages/MobileApprovePage'
 import { MobileHomePage } from '@/presentation/pages/MobileHomePage'
 import { MobileLoginPage } from '@/presentation/pages/MobileLoginPage'
+import { MobileScanPage } from '@/presentation/pages/MobileScanPage'
 import { StatusPage } from '@/presentation/pages/StatusPage'
 import { DependenciesProvider } from './DependenciesProvider'
 
@@ -29,6 +30,14 @@ export function App() {
               }
             />
 
+            <Route
+              path="/m/scan"
+              element={
+                <RequireAuth loginPath="/m/login">
+                  <MobileScanPage />
+                </RequireAuth>
+              }
+            />
             <Route
               path="/m/approve/:qrId"
               element={

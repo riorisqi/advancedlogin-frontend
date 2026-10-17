@@ -13,3 +13,16 @@ export class QrConflictError extends Error {
     this.name = 'QrConflictError'
   }
 }
+
+export type CameraProblem = 'insecure-context' | 'permission-denied' | 'no-camera' | 'unsupported' | 'unknown'
+
+/** The camera can't be used; `problem` says why, so the UI can give the right advice. */
+export class CameraUnavailableError extends Error {
+  readonly problem: CameraProblem
+
+  constructor(problem: CameraProblem) {
+    super(`Camera unavailable: ${problem}`)
+    this.name = 'CameraUnavailableError'
+    this.problem = problem
+  }
+}

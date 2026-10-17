@@ -23,5 +23,7 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  // Tests run with `bun test` (which type-strips TS itself); keep bun:test types out of the app build.
+  "exclude": ["src/**/*.test.ts"]
 }
