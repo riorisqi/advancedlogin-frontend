@@ -2,8 +2,7 @@ import type { HealthGateway } from '@/application/ports/HealthGateway'
 import type { HealthStatus, SystemHealth } from '@/domain/health/systemHealth'
 import { getJson } from '../http/httpClient'
 
-// Wire format of GET /api/health (mirrors HealthController.HealthResponse on the backend).
-// Kept private to infrastructure: if the backend renames a field, only this file changes.
+// Wire format of GET /api/health.
 type HealthResponseDto = {
   status: HealthStatus
   redis: HealthStatus

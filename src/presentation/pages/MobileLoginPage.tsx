@@ -4,14 +4,13 @@ import { useAuth } from '@/application/auth/authContext'
 import { InvalidCredentialsError, TooManyAttemptsError } from '@/application/auth/errors'
 import { Card } from '../components/Card'
 
-/** Password login for the "phone" client. The phone is the only place a password is ever typed. */
+/** The phone is the only place a password is ever typed. */
 export function MobileLoginPage() {
   const auth = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const from = (location.state as { from?: string } | null)?.from ?? '/m'
 
-  // Controlled inputs: React state is the single source of truth for the field values.
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)

@@ -1,6 +1,4 @@
-// Single place for fetch details: JSON, CSRF, error mapping.
-// Relative URLs: in dev, Vite proxies /api to Spring (see vite.config.ts), so the browser
-// sees one origin and sends cookies (SESSION, XSRF-TOKEN) automatically.
+// Relative URLs: in dev Vite proxies /api, so the browser sees one origin and sends cookies itself.
 
 export class HttpError extends Error {
   readonly status: number
@@ -34,11 +32,8 @@ type RequestOptions = {
 }
 
 /**
- * Sends a request and returns the raw Response (callers decide what each status means).
- *
- * CSRF (double-submit cookie): Spring puts a random token in the XSRF-TOKEN cookie, which JS
- * *can* read. We copy it into the X-XSRF-TOKEN header. A malicious site can make the browser
- * send our cookies, but it can't read them, so it can't produce the matching header.
+ * Returns the raw Response. CSRF (double-submit cookie): the JS-readable XSRF-TOKEN cookie is copied
+ * into the X-XSRF-TOKEN header; another site can make the browser send our cookies but can't read them.
  */
 export async function send(method: Method, url: string, options: RequestOptions = {}): Promise<Response> {
   const unsafe = method !== 'GET'
@@ -80,7 +75,6 @@ function doFetch(method: Method, url: string, { body, signal }: RequestOptions):
 }
 
 async function refreshCsrfToken(): Promise<void> {
-  // Makes the backend (re)issue the XSRF-TOKEN cookie.
   await fetch('/api/auth/csrf', { credentials: 'same-origin' })
 }
 

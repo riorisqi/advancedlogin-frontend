@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { formatCountdown, secondsUntilExpiry } from '@/domain/qr/qrSession'
 
-/** Self-updating "m:ss" until `deadline`. Pure display: it doesn't decide anything. */
+/** Self-updating "m:ss" until `deadline`. */
 export function Countdown({ deadline }: { deadline: Date }) {
   const [now, setNow] = useState(() => new Date())
 

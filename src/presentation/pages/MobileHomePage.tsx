@@ -3,7 +3,6 @@ import { Link } from 'react-router'
 import { useAuth } from '@/application/auth/authContext'
 import { Card } from '../components/Card'
 
-/** Logged-in phone home: scan a desktop's QR code, or sign out. */
 export function MobileHomePage() {
   const auth = useAuth()
   const [loggingOut, setLoggingOut] = useState(false)

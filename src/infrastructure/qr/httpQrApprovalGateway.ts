@@ -24,7 +24,7 @@ export function createHttpQrApprovalGateway(): QrApprovalGateway {
       const dto: LoginRequestDto = await res.json()
       return {
         qrId: dto.qrId,
-        requestedAt: new Date(dto.requestedAt), // a past moment, shown as-is
+        requestedAt: new Date(dto.requestedAt),
         browser: dto.browser,
         os: dto.os,
         ipAddress: dto.ipAddress,
@@ -47,7 +47,7 @@ async function throwOnError(res: Response): Promise<void> {
   if (res.ok) return
   if (res.status === 404) throw new QrNotFoundError()
   if (res.status === 409) {
-    // ProblemDetail body: { title, detail, status }. Show the backend's explanation.
+    // Show the backend's explanation from the ProblemDetail body.
     const problem = (await res.json().catch(() => null)) as { detail?: string } | null
     throw new QrConflictError(problem?.detail)
   }

@@ -6,9 +6,7 @@ import type { QrCodeScanner } from './ports/QrCodeScanner'
 import type { QrGateway } from './ports/QrGateway'
 import type { QrStatusStream } from './ports/QrStatusStream'
 
-// Every port the application needs. The concrete implementations are created in
-// `src/app/` (the composition root) and handed down through this context, so
-// application code never imports from `infrastructure/`.
+// Ports only; the implementations come from app/DependenciesProvider.
 export type Dependencies = {
   healthGateway: HealthGateway
   authGateway: AuthGateway

@@ -1,5 +1,3 @@
-// Domain: plain TypeScript. No React, no fetch, no JSON field names from the backend.
-
 export type HealthStatus = 'UP' | 'DOWN'
 
 export type SystemHealth = {

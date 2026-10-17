@@ -2,10 +2,7 @@ import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router'
 import { useAuth } from '@/application/auth/authContext'
 
-/**
- * Route guard. Note this is UX, not security: the backend still rejects every request without
- * a valid session. Hiding a page in the browser protects nothing on its own.
- */
+/** UX, not security: the backend still rejects every request without a valid session. */
 export function RequireAuth({ children, loginPath }: { children: ReactNode; loginPath: string }) {
   const auth = useAuth()
   const location = useLocation()

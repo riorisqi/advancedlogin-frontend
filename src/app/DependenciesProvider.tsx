@@ -7,8 +7,7 @@ import { createHttpQrApprovalGateway } from '@/infrastructure/qr/httpQrApprovalG
 import { createHttpQrGateway } from '@/infrastructure/qr/httpQrGateway'
 import { createSseQrStatusStream } from '@/infrastructure/qr/sseQrStatusStream'
 
-// Composition root: the only place that knows about concrete infrastructure.
-// Created once at module load so the objects keep a stable identity across renders.
+// Composition root. Created once, so the objects keep a stable identity across renders.
 const dependencies: Dependencies = {
   healthGateway: createHttpHealthGateway(),
   authGateway: createHttpAuthGateway(),

@@ -1,15 +1,12 @@
 import type { QrCodeScanner } from '@/application/ports/QrCodeScanner'
 import { CameraUnavailableError } from '@/application/qr/errors'
 
-/** How often to try decoding a frame. ~5×/s feels instant and keeps phones cool. */
+// ~5 frames/s feels instant and keeps phones cool.
 const SCAN_INTERVAL_MS = 200
 
 /**
- * getUserMedia for the camera stream + the standard BarcodeDetector API to decode frames.
- *
- * Only Chromium ships BarcodeDetector natively (not iOS Safari, not Firefox), so we use the
- * `barcode-detector` ponyfill: the same API, implemented with ZXing compiled to WebAssembly.
- * Both are loaded lazily (dynamic import), so users who never open the scanner don't download them.
+ * Only Chromium ships BarcodeDetector natively, so the `barcode-detector` ponyfill (ZXing as
+ * WebAssembly) provides it everywhere. Loaded lazily: users who never scan don't download it.
  */
 export function createCameraQrCodeScanner(): QrCodeScanner {
   return {
@@ -29,8 +26,7 @@ export function createCameraQrCodeScanner(): QrCodeScanner {
         let stopped = false
         let timer: ReturnType<typeof setTimeout> | undefined
 
-        // setTimeout chain (not setInterval): never start decoding a frame while the
-        // previous one is still being processed.
+        // setTimeout chain: never decode a new frame while the previous one is still running.
         const tick = async () => {
           if (stopped) return
           try {
@@ -40,7 +36,7 @@ export function createCameraQrCodeScanner(): QrCodeScanner {
               }
             }
           } catch {
-            // A frame that can't be decoded (e.g. mid-resize) is not an error worth surfacing.
+            // Undecodable frames (e.g. mid-resize) aren't errors.
           }
           if (!stopped) timer = setTimeout(tick, SCAN_INTERVAL_MS)
         }
@@ -77,9 +73,7 @@ async function openCamera(): Promise<MediaStream> {
 async function createDetector() {
   const [{ BarcodeDetector, prepareZXingModule }, { default: wasmUrl }] = await Promise.all([
     import('barcode-detector/ponyfill'),
-    // `?url`: Vite copies the .wasm into our build and gives us its URL. By default the library
-    // fetches it from a public CDN, which wouldn't work on a LAN without internet and leaks a
-    // request to a third party.
+    // Serve the .wasm from our build instead of the library's default CDN (offline LAN, no third party).
     import('zxing-wasm/reader/zxing_reader.wasm?url'),
   ])
   prepareZXingModule({

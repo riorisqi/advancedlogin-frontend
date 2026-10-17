@@ -32,8 +32,7 @@ export function QrLoginPanel() {
         >
           {state.kind === 'active' && (
             <>
-              {/* level "M" (~15% error correction): survives glare and a slightly blurry camera,
-                  without making the code so dense that cheap phones struggle to read it. */}
+              {/* level M (~15% error correction): survives glare without making the code too dense. */}
               <QRCodeSVG
                 value={state.session.content}
                 size={QR_SIZE}
@@ -76,8 +75,7 @@ export function QrLoginPanel() {
           </p>
         )}
 
-        {/* Dev shortcut until the phone camera scanner exists (slice 7): open the approve URL directly.
-            Open it in a *different* browser profile (e.g. incognito) that's logged in as the phone user. */}
+        {/* Dev shortcut instead of scanning: open it in another browser profile, logged in as the phone user. */}
         {import.meta.env.DEV && state.kind === 'active' && state.status === 'PENDING' && (
           <a
             href={state.session.content}

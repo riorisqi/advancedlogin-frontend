@@ -7,8 +7,6 @@ export type QrStatusStreamHandlers = {
   onUnavailable(): void
 }
 
-/** Server push for the desktop: "tell me whenever my QR's status changes". */
 export interface QrStatusStream {
-  /** Returns a function that closes the subscription. */
   subscribe(qrId: string, handlers: QrStatusStreamHandlers): () => void
 }

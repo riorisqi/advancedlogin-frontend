@@ -14,7 +14,6 @@ const CAMERA_ADVICE: Record<CameraProblem, string> = {
   unknown: 'The camera could not be started.',
 }
 
-/** /m/scan: point the phone at the desktop's QR code. */
 export function MobileScanPage() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const navigate = useNavigate()

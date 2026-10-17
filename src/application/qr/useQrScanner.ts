@@ -9,12 +9,7 @@ export type QrScannerState =
   | { kind: 'found'; qrId: string }
   | { kind: 'error'; problem: CameraProblem }
 
-/**
- * Phone-side use case: point the camera at the desktop until one of *our* approve links is seen.
- *
- * @param videoRef     where the camera preview is shown (owned by the page)
- * @param expectedOrigin our own origin; links to anywhere else are refused (see parseApproveLink)
- */
+/** @param expectedOrigin our own origin; links to anywhere else are refused */
 export function useQrScanner(videoRef: RefObject<HTMLVideoElement | null>, expectedOrigin: string): QrScannerState {
   const { qrCodeScanner } = useDependencies()
   const [state, setState] = useState<QrScannerState>({ kind: 'starting' })
@@ -28,24 +23,21 @@ export function useQrScanner(videoRef: RefObject<HTMLVideoElement | null>, expec
     const handleText = (text: string) => {
       const result = parseApproveLink(text, expectedOrigin)
       if (result.kind === 'ok') {
-        stop?.() // got it: release the camera right away
+        stop?.() // release the camera right away
         setState({ kind: 'found', qrId: result.qrId })
       } else {
-        // Keep scanning, but tell the user why this code didn't work.
         setState({ kind: 'scanning', lastRejected: result })
       }
     }
 
-    // queueMicrotask: React StrictMode (dev) runs effect → cleanup → effect synchronously. The
-    // first, cancelled run then never touches the camera, instead of starting it and racing the
-    // second run for the same <video> element.
+    // queueMicrotask: under StrictMode (dev) the cancelled first run never touches the camera,
+    // instead of racing the second run for the same <video>.
     queueMicrotask(() => {
       if (cancelled) return
       qrCodeScanner
         .start(video, (text) => !cancelled && handleText(text))
         .then((stopCamera) => {
-          // Unmounted while the camera was starting (e.g. user tapped Cancel): stop it at once,
-          // or the camera light would stay on.
+          // Unmounted while starting (e.g. Cancel tapped): stop now, or the camera light stays on.
           if (cancelled) stopCamera()
           else {
             stop = stopCamera

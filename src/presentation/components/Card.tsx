@@ -8,7 +8,6 @@ type CardProps = {
   children: ReactNode
 }
 
-/** Centered card layout shared by the desktop and phone screens (mobile-first: full width on small screens). */
 export function Card({ title, subtitle, wide = false, children }: CardProps) {
   return (
     <main className="min-h-dvh bg-slate-50 flex items-center justify-center p-4">

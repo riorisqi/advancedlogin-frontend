@@ -1,7 +1,6 @@
 /**
- * What the phone does with text read from *any* QR code. A camera happily decodes a menu, a
- * Wi-Fi password or a phishing link, so we never navigate to the scanned URL. We only accept our
- * own approve link and pull the qrId out of it.
+ * A camera decodes anything (menus, Wi-Fi configs, phishing links), so we never navigate to the
+ * scanned URL: only our own approve link is accepted, and only its qrId is used.
  */
 export type ApproveLinkResult =
   | { kind: 'ok'; qrId: string }
@@ -11,7 +10,6 @@ export type ApproveLinkResult =
 
 const APPROVE_PATH = /^\/m\/approve\/([A-Za-z0-9_-]{43})$/
 
-/** @param expectedOrigin the phone app's own origin, e.g. "https://192.168.1.5:5173" */
 export function parseApproveLink(text: string, expectedOrigin: string): ApproveLinkResult {
   let url: URL
   try {

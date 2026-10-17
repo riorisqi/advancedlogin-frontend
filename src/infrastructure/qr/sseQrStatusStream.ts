@@ -7,14 +7,10 @@ type QrStatusEventDto = {
   status: QrStatus
   expiresAt: string
   exchangeCode: string | null
-  serverTime: string // EventSource hides response headers, so the server sends its clock in the payload
+  serverTime: string // EventSource hides response headers (no Date header)
 }
 
-/**
- * EventSource = the browser's built-in SSE client. It sends cookies on same-origin requests
- * (so qr_bind goes along), parses the `event:`/`data:` lines, and reconnects on its own after
- * a dropped connection. On reconnect the server starts with a fresh snapshot, so nothing is lost.
- */
+/** EventSource sends cookies (same origin) and reconnects on its own; every reconnect starts with a snapshot. */
 export function createSseQrStatusStream(): QrStatusStream {
   return {
     subscribe(qrId, { onSnapshot, onUnavailable }) {

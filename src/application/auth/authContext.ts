@@ -1,8 +1,6 @@
 import { createContext, useContext } from 'react'
 import type { User } from '@/domain/user/user'
 
-// Who is logged in is app-wide state (header, route guards, pages), so it lives in one
-// provider instead of every page calling /api/me itself.
 export type AuthState =
   | { status: 'loading' }
   | { status: 'anonymous' }

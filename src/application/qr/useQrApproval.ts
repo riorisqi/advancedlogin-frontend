@@ -12,10 +12,7 @@ export type QrApprovalState =
   | { kind: 'rejected' }
   | { kind: 'failed'; reason: QrApprovalFailure; message: string }
 
-/**
- * Phone-side use case: scan (claim) the QR on mount, then let the user approve or reject.
- * Scanning is idempotent on the backend, so StrictMode's double mount in dev is harmless here.
- */
+/** Scanning is idempotent on the backend, so StrictMode's double mount in dev is harmless. */
 export function useQrApproval(qrId: string) {
   const { qrApprovalGateway } = useDependencies()
   const [state, setState] = useState<QrApprovalState>({ kind: 'loading' })

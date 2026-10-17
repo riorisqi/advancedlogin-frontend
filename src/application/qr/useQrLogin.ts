@@ -7,10 +7,9 @@ import type { QrGateway } from '../ports/QrGateway'
 /** Like WhatsApp Web: silently swap in a fresh QR a few times, then wait for a click. */
 const MAX_AUTO_REFRESHES = 3
 
-/** Fallback polling interval, used only when the live stream (SSE) can't be used. */
+/** Only used when the SSE stream can't be. */
 const POLL_INTERVAL_MS = 2000
 
-/** How status updates are currently arriving (shown in dev, handy for learning/debugging). */
 export type QrLiveTransport = 'sse' | 'polling'
 
 export type QrLoginState =
@@ -31,13 +30,11 @@ export function useQrLogin(): { state: QrLoginState; refresh: () => void; transp
   const [generation, setGeneration] = useState(0)
   const autoRefreshes = useRef(0)
 
-  // 1. Create a session (on mount and whenever `generation` changes).
+  // 1. Create a session.
   useEffect(() => {
     let cancelled = false
-    // Why queueMicrotask: in dev, React StrictMode runs effect → cleanup → effect synchronously.
-    // Starting the POST in a microtask lets the first run be cancelled *before* it hits the
-    // network. Otherwise two sessions get created and the browser keeps whichever qr_bind
-    // cookie arrives last, which may not match the QR on screen.
+    // StrictMode (dev) runs effect → cleanup → effect synchronously. A microtask lets the first run
+    // be cancelled before it hits the network; otherwise two sessions race for the qr_bind cookie.
     queueMicrotask(async () => {
       if (cancelled) return
       try {
@@ -59,7 +56,7 @@ export function useQrLogin(): { state: QrLoginState; refresh: () => void; transp
     }
   }, [qrGateway, generation])
 
-  // 2. Follow the status while a QR is on screen: live stream first, polling as fallback.
+  // 2. Follow the status: SSE first, polling as fallback.
   const activeId = state.kind === 'active' ? state.session.id : null
   useEffect(() => {
     if (!activeId) return
@@ -81,7 +78,7 @@ export function useQrLogin(): { state: QrLoginState; refresh: () => void; transp
     }
   }, [qrGateway, qrStatusStream, activeId])
 
-  // 3. Countdown, plus what to do when it hits zero.
+  // 3. Countdown and expiry.
   const activeSession = state.kind === 'active' ? state.session : null
   useEffect(() => {
     if (!activeSession) return
@@ -106,15 +103,13 @@ export function useQrLogin(): { state: QrLoginState; refresh: () => void; transp
     setGeneration((g) => g + 1)
   }, [])
 
-  // 4. Approved on the phone: trade the code for a real session, then let the auth state
-  //    re-read /api/me. The page then re-renders as signed in (this component unmounts).
+  // 4. Approved: exchange the code, then re-read /api/me (the page then renders as signed in).
   const confirmed = state.kind === 'confirmed' ? state : null
   const refreshAuth = auth.refresh
   useEffect(() => {
     if (!confirmed) return
     let cancelled = false
-    // queueMicrotask again: StrictMode's dev double-run must not send the one-time code twice
-    // (the second request would get 409 and flash an error).
+    // queueMicrotask again: the one-time code must not be sent twice.
     queueMicrotask(async () => {
       if (cancelled) return
       try {
@@ -135,11 +130,7 @@ export function useQrLogin(): { state: QrLoginState; refresh: () => void; transp
   return { state, refresh, transport }
 }
 
-/**
- * Polls the snapshot endpoint until stopped. A setTimeout chain, not setInterval: the next poll
- * is scheduled only after the previous response arrived, so a slow network can never stack up
- * overlapping requests.
- */
+/** A setTimeout chain, not setInterval: a slow network can never stack up overlapping polls. */
 function startPolling(qrGateway: QrGateway, qrId: string, onSnapshot: (s: QrStatusSnapshot) => void): () => void {
   let stopped = false
   let timer: ReturnType<typeof setTimeout> | undefined
@@ -150,11 +141,11 @@ function startPolling(qrGateway: QrGateway, qrId: string, onSnapshot: (s: QrStat
       const snapshot = await qrGateway.getStatus(qrId, controller.signal)
       if (!stopped) onSnapshot(snapshot)
     } catch {
-      // Network blip: keep the current state and try again on the next tick.
+      // Network blip: try again next tick.
     }
     if (!stopped) timer = setTimeout(poll, POLL_INTERVAL_MS)
   }
-  void poll() // first poll right away: the stream just failed, so we know nothing current
+  void poll() // right away: the stream just failed
 
   return () => {
     stopped = true
@@ -163,7 +154,6 @@ function startPolling(qrGateway: QrGateway, qrId: string, onSnapshot: (s: QrStat
   }
 }
 
-/** Pure state transition: previous UI state + server snapshot → next UI state. */
 function applySnapshot(prev: QrLoginState, polledId: string, snapshot: QrStatusSnapshot): QrLoginState {
   // Ignore late answers about a QR that's no longer on screen.
   if (prev.kind !== 'active' || prev.session.id !== polledId) return prev

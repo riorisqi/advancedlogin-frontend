@@ -1,8 +1,6 @@
 /**
- * Converting server timestamps to this browser's clock.
- *
- * The user's PC clock may be minutes off from the server's. So instead of trusting the absolute
- * time, take the *remaining lifetime* (deadline − server's "now") and add it to the local clock.
+ * The user's clock may be minutes off, so a server deadline becomes "remaining lifetime
+ * (deadline − server's now) added to the local clock".
  */
 export function toLocalClock(serverIso: string, serverNowMs: number): Date {
   const remainingMs = new Date(serverIso).getTime() - serverNowMs

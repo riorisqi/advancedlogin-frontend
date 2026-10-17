@@ -6,8 +6,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { authGateway } = useDependencies()
   const [state, setState] = useState<AuthState>({ status: 'loading' })
 
-  // On startup, ask the backend whether the SESSION cookie is still valid.
-  // The cookie itself is HttpOnly: JS can't read it, so this round trip is the only way to know.
+  // SESSION is HttpOnly, so asking the backend is the only way to know whether it's still valid.
   useEffect(() => {
     const controller = new AbortController()
     authGateway
@@ -37,8 +36,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState(user ? { status: 'authenticated', user } : { status: 'anonymous' })
   }, [authGateway])
 
-  // useMemo keeps the context value stable, so consumers don't re-render on every
-  // provider render, only when the auth state actually changes.
   const value = useMemo<Auth>(() => ({ ...state, login, logout, refresh }), [state, login, logout, refresh])
 
   return <AuthContext value={value}>{children}</AuthContext>

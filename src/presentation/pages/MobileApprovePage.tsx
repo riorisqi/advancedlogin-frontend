@@ -5,7 +5,6 @@ import { useQrApproval } from '@/application/qr/useQrApproval'
 import { Card } from '../components/Card'
 import { Countdown } from '../components/Countdown'
 
-/** Opened by scanning the desktop's QR (/m/approve/:qrId). Behind RequireAuth: the phone must be logged in. */
 export function MobileApprovePage() {
   const { qrId = '' } = useParams()
   const auth = useAuth()
@@ -46,7 +45,7 @@ export function MobileApprovePage() {
         <Detail label="Time left" value={<Countdown deadline={request.expiresAt} />} />
       </dl>
 
-      {/* QRLjacking: an attacker can show *their* QR to the victim. These details are the defence. */}
+      {/* QRLjacking: these details are the defence against a relayed QR. */}
       <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
         Only approve if you're in front of this computer and just opened its login page yourself.
         Never approve a QR code that someone sent you.
